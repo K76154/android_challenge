@@ -1,12 +1,5 @@
 package news.agoda.com.sample;
 
-import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +7,14 @@ import java.util.List;
  */
 public class NewsEntity {
     private static final String TAG = NewsEntity.class.getSimpleName();
+
+    public static final String NEWS_TITLE = "title";
+    public static final String NEWS_ABSTRACT = "abstract";
+    public static final String NEWS_URL = "url";
+    public static final String NEWS_BYLINE = "byline";
+    public static final String NEWS_PUBLISHED_DATE = "published_date";
+    public static final String NEWS_MULTIMEDIA = "multimedia";
+
     private String title;
     private String summary;
     private String articleUrl;
@@ -21,24 +22,51 @@ public class NewsEntity {
     private String publishedDate;
     private List<MediaEntity> mediaEntityList;
 
-    public NewsEntity(JSONObject jsonObject) {
-        try {
-            mediaEntityList = new ArrayList<>();
-            title = jsonObject.getString("title");
-            summary = jsonObject.getString("abstract");
-            articleUrl = jsonObject.getString("url");
-            byline = jsonObject.getString("byline");
-            publishedDate = jsonObject.getString("published_date");
-            JSONArray mediaArray = jsonObject.getJSONArray("multimedia");
-            for (int i = 0; i < mediaArray.length(); i++) {
-                JSONObject mediaObject = mediaArray.getJSONObject(i);
-                MediaEntity mediaEntity = new MediaEntity(mediaObject);
-                mediaEntityList.add(mediaEntity);
-            }
+    //JYHSU Use Builder pattern because the number of parameters is not small.
+    public static class Builder {
+        //JYHSU Required fields
+        private final String title;
+        private final String articleUrl;
+        private final String publishedDate;
 
-        } catch (JSONException exception) {
-            Log.e(TAG, exception.getMessage());
+        //JYHSU Optional fields
+        private String summary = "";
+        private String byline = "";
+        private List<MediaEntity> mediaEntityList = null;
+
+        public Builder(String title, String articleUrl, String publishedDate) {
+            this.title = title;
+            this.articleUrl = articleUrl;
+            this.publishedDate = publishedDate;
         }
+
+        public Builder summary(String summary) {
+            this.summary = summary;
+            return this;
+        }
+
+        public Builder byline(String byline) {
+            this.byline = byline;
+            return this;
+        }
+
+        public Builder mediaEntityList(final List<MediaEntity> mediaEntityList) {
+            this.mediaEntityList = mediaEntityList;
+            return this;
+        }
+
+        public NewsEntity build() {
+            return new NewsEntity(this);
+        }
+    }
+
+    private NewsEntity(Builder builder) {
+        title = builder.title;
+        summary = builder.summary;
+        articleUrl = builder.articleUrl;
+        byline = builder.byline;
+        publishedDate = builder.publishedDate;
+        mediaEntityList = builder.mediaEntityList;
     }
 
     public String getTitle() {

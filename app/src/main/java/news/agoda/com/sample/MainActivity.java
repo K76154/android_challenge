@@ -1,11 +1,5 @@
 package news.agoda.com.sample;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -85,9 +85,9 @@ public class MainActivity
 
     private static String readStream(InputStream in) {
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in));) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 
-            String nextLine = "";
+            String nextLine;
             while ((nextLine = reader.readLine()) != null) {
                 sb.append(nextLine);
             }
@@ -101,13 +101,13 @@ public class MainActivity
         handler.postDelayed(new Runnable() {
             @Override public void run() {
                 JSONObject jsonObject;
-
+                NewsManager manager = new NewsManager();
                 try {
                     jsonObject = new JSONObject(data);
                     JSONArray resultArray = jsonObject.getJSONArray("results");
                     for (int i = 0; i < resultArray.length(); i++) {
                         JSONObject newsObject = resultArray.getJSONObject(i);
-                        NewsEntity newsEntity = new NewsEntity(newsObject);
+                        NewsEntity newsEntity = manager.createNewsEntity(newsObject);
                         newsItemList.add(newsEntity);
                     }
                 } catch (JSONException e) {

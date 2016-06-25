@@ -2,6 +2,7 @@ package news.agoda.com.sample;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,24 +16,18 @@ import com.facebook.imagepipeline.request.ImageRequest;
 
 import java.util.List;
 
-public class NewsListAdapter extends ArrayAdapter {
+public class NewsListAdapter extends ArrayAdapter<NewsEntity> {
     private static class ViewHolder {
         TextView newsTitle;
         DraweeView imageView;
     }
 
-    public NewsListAdapter(Context context, int resource, List objects) {
+    public NewsListAdapter(Context context, int resource, List<NewsEntity> objects) {
         super(context, resource, objects);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        NewsEntity newsEntity = (NewsEntity) getItem(position);
-        List<MediaEntity> mediaEntityList = newsEntity.getMediaEntity();
-        String thumbnailURL = "";
-        MediaEntity mediaEntity = mediaEntityList.get(0);
-        thumbnailURL = mediaEntity.getUrl();
-
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
@@ -44,10 +39,15 @@ public class NewsListAdapter extends ArrayAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
+        NewsEntity newsEntity = getItem(position);
         viewHolder.newsTitle.setText(newsEntity.getTitle());
-        DraweeController draweeController = Fresco.newDraweeControllerBuilder().setImageRequest(ImageRequest.fromUri
-                (Uri.parse(thumbnailURL))).setOldController(viewHolder.imageView.getController()).build();
-        viewHolder.imageView.setController(draweeController);
+        String thumbnailURL = new NewsManager().getThumbnailUrlForNews(newsEntity);
+        if(!TextUtils.isEmpty(thumbnailURL)) {
+            DraweeController draweeController = Fresco.newDraweeControllerBuilder().setImageRequest(ImageRequest.fromUri
+                    (Uri.parse(thumbnailURL))).setOldController(viewHolder.imageView.getController()).build();
+            viewHolder.imageView.setController(draweeController);
+        }
         return convertView;
     }
 }
