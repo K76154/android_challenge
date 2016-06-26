@@ -11,6 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import news.agoda.com.sample.util.ImageUtils;
+
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,7 +43,9 @@ public class DetailedViewPresenterTest extends InstrumentationTestCase {
         extras.putString(IDetailedView.EXTRA_IMAGEURL, "http://static01.nyt.com/images/2015/08/18/business/18EMPLOY/18EMPLOY-thumbLarge.jpg");
         extras.putString(IDetailedView.EXTRA_STORYURL, "http://www.nytimes.com/2015/08/13/technology/personaltech/new-school-technology-for-class-and-the-quad.html");
         DraweeController mockController = Mockito.mock(DraweeController.class);
-        doReturn(mockController).when(presenter).getImageController(Mockito.any(ImageRequest.class));
+        ImageUtils imageUtils = Mockito.spy(new ImageUtils());
+        doReturn(mockController).when(imageUtils).getImageController(any(ImageRequest.class), any(DraweeController.class));
+        doReturn(imageUtils).when(presenter).getImageUtils();
         presenter.onCreate(null, extras);
         verify(detailedView, times(1)).setTitleView("title");
         verify(detailedView, times(1)).setSummaryView("summary");

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -37,11 +38,14 @@ public class DetailViewActivity extends Activity implements IDetailedView {
 
     public void onFullStoryClicked(View view) {
         String storyUrl = presenter.getStoryUrl();
-        if(null != storyUrl) {
+        //JYHSU We already checked the url is valid in the presenter, but just in case
+        if(URLUtil.isValidUrl(storyUrl)) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(presenter.getStoryUrl()));
+            intent.setData(Uri.parse(storyUrl));
             startActivity(intent);
         }
+        //JYHSU In case something rare happens and the url is not valid, we may want to prompt user a dialog here. However, that's beyond
+        // the scope of this simple test.
     }
 
     @Override

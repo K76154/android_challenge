@@ -18,7 +18,7 @@ public class ImageUtils {
     }
 
     public ImageRequest getImageRequest(String imageURL) {
-        if(null == imageURL || !URLUtil.isValidUrl(imageURL))
+        if(!URLUtil.isValidUrl(imageURL))
             return null;
 
         return ImageRequest.fromUri(Uri.parse(imageURL));

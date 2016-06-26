@@ -30,9 +30,9 @@ public class MainActivityPresenterImpl implements IMainActivityPresenter {
     }
 
     @Override
-    public String loadResource() {
+    public String loadResource(String sourceUrl) {
         try {
-            URL url = new URL("http://www.mocky.io/v2/573c89f31100004a1daa8adb");
+            URL url = new URL(sourceUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             return readStream(con.getInputStream());
         } catch (Exception e) {
@@ -75,11 +75,9 @@ public class MainActivityPresenterImpl implements IMainActivityPresenter {
         }
 
         for (int i = 0; i < resultArray.length(); i++) {
-            JSONObject newsObject = resultArray.optJSONObject(i);
-            if(null != newsObject) {
-                NewsEntity newsEntity = manager.createNewsEntity(newsObject);
+            NewsEntity newsEntity = manager.createNewsEntity(resultArray.optJSONObject(i));
+            if(null != newsEntity)
                 newsItemList.add(newsEntity);
-            }
         }
 
         return newsItemList;
