@@ -27,17 +27,17 @@ public class NewsEntity {
         //JYHSU Required fields
         private final String title;
         private final String articleUrl;
-        private final String publishedDate;
+
 
         //JYHSU Optional fields
+        private String publishedDate;
         private String summary = "";
         private String byline = "";
         private List<MediaEntity> mediaEntityList = null;
 
-        public Builder(String title, String articleUrl, String publishedDate) {
+        public Builder(String title, String articleUrl) {
             this.title = title;
             this.articleUrl = articleUrl;
-            this.publishedDate = publishedDate;
         }
 
         public Builder summary(String summary) {
@@ -47,6 +47,11 @@ public class NewsEntity {
 
         public Builder byline(String byline) {
             this.byline = byline;
+            return this;
+        }
+
+        public Builder publishedDate(String publishedDate) {
+            this.publishedDate = publishedDate;
             return this;
         }
 

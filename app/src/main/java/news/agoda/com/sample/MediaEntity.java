@@ -26,24 +26,44 @@ public class MediaEntity {
     //JYHSU Use Builder pattern because the number of parameters is not small.
     public static class Builder {
         //JYHSU Required fields
-        private String url;
+        private final String url;
+
+        //JYHSU Optional fields
         private String format;
         private int height;
         private int width;
         private String type;
         private String subType;
-
-        //JYHSU Optional fields
         private String caption;
         private String copyright;
 
-        public Builder(String url, String format, int height, int width, String type, String subType) {
+        public Builder(String url) {
             this.url = url;
+        }
+
+        public Builder format(String format) {
             this.format = format;
+            return this;
+        }
+
+        public Builder height(int height) {
             this.height = height;
+            return this;
+        }
+
+        public Builder width(int width) {
             this.width = width;
+            return this;
+        }
+
+        public Builder type(String type) {
             this.type = type;
+            return this;
+        }
+
+        public Builder subType(String subType) {
             this.subType = subType;
+            return this;
         }
 
         public Builder caption(String caption) {

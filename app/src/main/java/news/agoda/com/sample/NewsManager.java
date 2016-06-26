@@ -1,9 +1,9 @@
 package news.agoda.com.sample;
 
-import android.util.Log;
+import android.text.TextUtils;
+import android.webkit.URLUtil;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -16,45 +16,65 @@ import java.util.List;
 public class NewsManager {
     private static final String TAG = NewsManager.class.getSimpleName();
 
-    public NewsEntity createNewsEntity(final JSONObject jsonObject) throws JSONException {
+    public NewsEntity createNewsEntity(JSONObject jsonObject) {
+        if(null == jsonObject)
+            return null;
+
+        String articleUrl = jsonObject.optString(NewsEntity.NEWS_URL, null);
+        //JYHSU Not a valid URL, or not http/https
+        if(!(URLUtil.isValidUrl(articleUrl) && (URLUtil.isHttpsUrl(articleUrl) || URLUtil.isHttpUrl(articleUrl))))
+            return null;
+
+        String title = jsonObject.optString(NewsEntity.NEWS_TITLE, null);
+        if(TextUtils.isEmpty(title))
+            return null;
+
+        String summary = jsonObject.optString(NewsEntity.NEWS_ABSTRACT, null);
+        String byline = jsonObject.optString(NewsEntity.NEWS_BYLINE, null);
+        String publishedDate = jsonObject.optString(NewsEntity.NEWS_PUBLISHED_DATE, null);
+
+        NewsEntity.Builder builder = new NewsEntity.Builder(title, articleUrl).byline(byline).summary(summary)
+                .publishedDate(publishedDate);
+
+        JSONArray mediaArray = jsonObject.optJSONArray(NewsEntity.NEWS_MULTIMEDIA);
+        if(null != mediaArray) {
             List<MediaEntity> mediaEntityList = new ArrayList<>();
-            String title = jsonObject.getString(NewsEntity.NEWS_TITLE);
-            String summary = jsonObject.getString(NewsEntity.NEWS_ABSTRACT);
-            String articleUrl = jsonObject.getString(NewsEntity.NEWS_URL);
-            String byline = jsonObject.getString(NewsEntity.NEWS_BYLINE);
-            String publishedDate = jsonObject.getString(NewsEntity.NEWS_PUBLISHED_DATE);
-            JSONArray mediaArray = jsonObject.getJSONArray(NewsEntity.NEWS_MULTIMEDIA);
             for (int i = 0; i < mediaArray.length(); i++) {
-                JSONObject mediaObject = mediaArray.getJSONObject(i);
-                try {
-                    MediaEntity mediaEntity = this.createMediaEntity(mediaObject);
+                JSONObject mediaObject = mediaArray.optJSONObject(i);
+                MediaEntity mediaEntity = this.createMediaEntity(mediaObject);
+                if (null != mediaEntity)
                     mediaEntityList.add(mediaEntity);
-                }
-                catch(JSONException e) {
-                    Log.e(TAG, e.getMessage());
-                }
             }
 
-        return new NewsEntity.Builder(title, articleUrl, publishedDate).byline(byline).summary(summary)
-                .mediaEntityList(mediaEntityList).build();
+            if (mediaEntityList.size() > 0)
+                builder.mediaEntityList(mediaEntityList);
+        }
+
+        return builder.build();
     }
 
-    public MediaEntity createMediaEntity(final JSONObject jsonObject) throws JSONException {
-        String url = jsonObject.getString(MediaEntity.MEDIA_URL);
-        String format = jsonObject.getString(MediaEntity.MEDIA_FORMAT);
-        int height = jsonObject.getInt(MediaEntity.MEDIA_HEIGHT);
-        int width = jsonObject.getInt(MediaEntity.MEDIA_WIDTH);
-        String type = jsonObject.getString(MediaEntity.MEDIA_TYPE);
-        String subType = jsonObject.getString(MediaEntity.MEDIA_SUBTYPE);
-        String caption = jsonObject.getString(MediaEntity.MEDIA_CAPTION);
-        String copyright = jsonObject.getString(MediaEntity.MEDIA_COPYRIGHT);
-        return new MediaEntity.Builder(url, format, height, width, type, subType)
-                .caption(caption).copyright(copyright).build();
+    public MediaEntity createMediaEntity(JSONObject jsonObject) {
+        if(null == jsonObject)
+            return null;
+
+        String url = jsonObject.optString(MediaEntity.MEDIA_URL, null);
+        if(!URLUtil.isValidUrl(url))
+            return null;
+
+        String format = jsonObject.optString(MediaEntity.MEDIA_FORMAT, null);
+        int height = jsonObject.optInt(MediaEntity.MEDIA_HEIGHT);
+        int width = jsonObject.optInt(MediaEntity.MEDIA_WIDTH);
+        String type = jsonObject.optString(MediaEntity.MEDIA_TYPE, null);
+        String subType = jsonObject.optString(MediaEntity.MEDIA_SUBTYPE, null);
+        String caption = jsonObject.optString(MediaEntity.MEDIA_CAPTION, null);
+        String copyright = jsonObject.optString(MediaEntity.MEDIA_COPYRIGHT, null);
+        return new MediaEntity.Builder(url).format(format).height(height).width(width).type(type)
+                .subType(subType).caption(caption).copyright(copyright).build();
     }
 
     public String getThumbnailUrlForNews(final NewsEntity newsEntity) {
         List<MediaEntity> mediaEntityList = newsEntity.getMediaEntity();
-        if(mediaEntityList.size() > 0) {
+        if(null != mediaEntityList && mediaEntityList.size() > 0) {
             MediaEntity mediaEntity = mediaEntityList.get(0);
             return mediaEntity.getUrl();
         }
