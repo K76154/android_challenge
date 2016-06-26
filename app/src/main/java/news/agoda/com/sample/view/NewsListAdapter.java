@@ -1,20 +1,22 @@
-package news.agoda.com.sample;
+package news.agoda.com.sample.view;
 
 import android.content.Context;
-import android.net.Uri;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 
 import java.util.List;
+
+import news.agoda.com.sample.R;
+import news.agoda.com.sample.model.NewsEntity;
+import news.agoda.com.sample.model.NewsManager;
+import news.agoda.com.sample.util.ImageUtils;
 
 public class NewsListAdapter extends ArrayAdapter<NewsEntity> {
     private static class ViewHolder {
@@ -39,15 +41,20 @@ public class NewsListAdapter extends ArrayAdapter<NewsEntity> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
         NewsEntity newsEntity = getItem(position);
         viewHolder.newsTitle.setText(newsEntity.getTitle());
-        String thumbnailURL = new NewsManager().getThumbnailUrlForNews(newsEntity);
-        if(!TextUtils.isEmpty(thumbnailURL)) {
-            DraweeController draweeController = Fresco.newDraweeControllerBuilder().setImageRequest(ImageRequest.fromUri
-                    (Uri.parse(thumbnailURL))).setOldController(viewHolder.imageView.getController()).build();
+        updateThumbnail(viewHolder, newsEntity);
+
+        return convertView;
+    }
+
+    public void updateThumbnail(ViewHolder viewHolder, NewsEntity newsEntity) {
+        ImageUtils imageUtils = new ImageUtils();
+        ImageRequest request = imageUtils.getImageRequest(new NewsManager().getThumbnailUrlForNews(newsEntity));
+        if(null != request) {
+            DraweeController draweeController = imageUtils.getImageController(request,
+                    viewHolder.imageView.getController());
             viewHolder.imageView.setController(draweeController);
         }
-        return convertView;
     }
 }

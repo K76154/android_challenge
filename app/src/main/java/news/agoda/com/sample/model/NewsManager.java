@@ -1,4 +1,4 @@
-package news.agoda.com.sample;
+package news.agoda.com.sample.model;
 
 import android.text.TextUtils;
 import android.webkit.URLUtil;
@@ -73,9 +73,17 @@ public class NewsManager {
     }
 
     public String getThumbnailUrlForNews(final NewsEntity newsEntity) {
+        return getImageUrlForNews(newsEntity, 0);
+    }
+
+    public String getLargeThumbnailUrlForNews(final NewsEntity newsEntity) {
+        return getImageUrlForNews(newsEntity, 1);
+    }
+
+    private String getImageUrlForNews(final NewsEntity newsEntity, int index) {
         List<MediaEntity> mediaEntityList = newsEntity.getMediaEntity();
-        if(null != mediaEntityList && mediaEntityList.size() > 0) {
-            MediaEntity mediaEntity = mediaEntityList.get(0);
+        if(null != mediaEntityList && mediaEntityList.size() > index) {
+            MediaEntity mediaEntity = mediaEntityList.get(index);
             return mediaEntity.getUrl();
         }
 

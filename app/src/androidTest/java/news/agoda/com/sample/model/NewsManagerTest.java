@@ -1,6 +1,6 @@
-package news.agoda.com.sample;
+package news.agoda.com.sample.model;
 
-import android.test.InstrumentationTestCase;
+import android.test.AndroidTestCase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by JYHSU on 2016/6/25.
  */
-public class NewsManagerTest extends InstrumentationTestCase {
+public class NewsManagerTest extends AndroidTestCase {
 
     //JYHSU Workaround for the dexmaker problem. I can make this in a super class and make all my test classes inherit it, but that will be a
     //very bad practice, as it is against the favor composition over inheritance guideline. When they eventually fix this problem, I am left with
@@ -29,7 +29,7 @@ public class NewsManagerTest extends InstrumentationTestCase {
     public void setUp() {
         System.setProperty(
                 "dexmaker.dexcache",
-                getInstrumentation().getTargetContext().getCacheDir().getPath());
+                getContext().getCacheDir().getPath());
     }
 
     @Test
